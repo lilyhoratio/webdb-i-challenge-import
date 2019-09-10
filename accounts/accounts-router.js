@@ -15,7 +15,7 @@ router.get(`/`, async (req, res) => {
     res.status(200).json(accounts);
   } catch (err) {
     console.log(err);
-    res.status(500).json({ error: "Server error getting accounts" });
+    res.status(500).json({ error: "Server error retrieving accounts." });
   }
 });
 
@@ -34,7 +34,7 @@ router.get(`/:id`, async (req, res) => {
     }
   } catch (err) {
     console.log(err);
-    res.status(500).json({ error: "Server error getting account" });
+    res.status(500).json({ error: "Server error retrieving account." });
   }
   // } else {
   //   res.status(400).json({ message: `Account ${id} does not exist.` });
@@ -53,7 +53,7 @@ router.post(`/`, async (req, res) => {
       res.status(200).json(newAccount);
     } catch (err) {
       console.log(err);
-      res.status(500).json({ err: "Server error adding account" });
+      res.status(500).json({ err: "Server error adding account." });
     }
   } else {
     res
@@ -82,13 +82,13 @@ router.put(`/:id`, async (req, res) => {
     const updatedCount = await Accounts.update(accountId, updatedAccount);
 
     if (updatedCount) {
-      res.status(200).json({ message: `${updatedCount} account(s) updated` });
+      res.status(200).json({ message: `${updatedCount} account(s) updated.` });
     } else {
-      res.status(500).json({ message: `Account ${accountId} not found` });
+      res.status(404).json({ error: `Account ${accountId} does not exist.` });
     }
   } catch (err) {
     console.log(err);
-    res.status(500).json({ err: "Server error updating record" });
+    res.status(500).json({ err: "Server error updating record." });
   }
 });
 
@@ -99,14 +99,15 @@ router.delete(`/:id`, validateAccountId, async (req, res) => {
 
   try {
     const deletedCount = await Accounts.remove(accountId);
-    res.status(200).json({ message: `deleted ${deletedCount} accounts` });
+    res.status(200).json({ message: `deleted ${deletedCount} accounts.` });
   } catch (err) {
     console.log(err);
-    res.status(500).json({ err: "Server error deleting record" });
+    res.status(500).json({ err: "Server error deleting record." });
   }
 });
 
 // CUSTOM MIDDLEWARE
+// ================================================
 function validateAccountId(req, res, next) {
   const accountId = req.params.id;
   Accounts.findById(accountId)
@@ -115,14 +116,12 @@ function validateAccountId(req, res, next) {
         req.account = account;
         next();
       } else {
-        res.status(404).json({ error: `account ${accountId} does not exist!` });
+        res.status(404).json({ error: `Account ${accountId} does not exist.` });
       }
     })
     .catch(err => {
       console.log(err);
-      res
-        .status(500)
-        .json({ error: `account ${accountId} could not be retrieved` });
+      res.status(500).json({ error: `Server error retrieving account` });
     });
 }
 
